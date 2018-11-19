@@ -1,4 +1,3 @@
-cordova.define("cordova-plugin-inappbrowser.inappbrowser", function(require, exports, module) {
 /*
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -34,6 +33,7 @@ cordova.define("cordova-plugin-inappbrowser.inappbrowser", function(require, exp
 
     function InAppBrowser () {
         this.channels = {
+            'beforeload': channel.create('beforeload'),
             'loadstart': channel.create('loadstart'),
             'loadstop': channel.create('loadstop'),
             'loaderror': channel.create('loaderror'),
@@ -45,19 +45,24 @@ cordova.define("cordova-plugin-inappbrowser.inappbrowser", function(require, exp
     InAppBrowser.prototype = {
         _eventHandler: function (event) {
             if (event && (event.type in this.channels)) {
-                this.channels[event.type].fire(event);
+                if (event.type === 'beforeload') {
+                    this.channels[event.type].fire(event, this._loadAfterBeforeload);
+                } else {
+                    this.channels[event.type].fire(event);
+                }
             }
         },
-
+        _loadAfterBeforeload: function (strUrl) {
+            strUrl = urlutil.makeAbsolute(strUrl);
+            exec(null, null, 'InAppBrowser', 'loadAfterBeforeload', [strUrl]);
+        },
         getLastTouchTs: function(successCallback) {
             exec(successCallback, null, "InAppBrowser", "getLastTouchTs", []);
         },
-       setLastTouchTs: function(lts,successCallback) {
+        setLastTouchTs: function(lts,successCallback) {
             exec(successCallback, null, "InAppBrowser", "setLastTouchTs", [lts]);
         },
-
-
-        close: function (eventname) {
+       close: function (eventname) {
             exec(null, null, 'InAppBrowser', 'close', []);
         },
         show: function (eventname) {
@@ -123,5 +128,3 @@ cordova.define("cordova-plugin-inappbrowser.inappbrowser", function(require, exp
         return iab;
     };
 })();
-
-});
