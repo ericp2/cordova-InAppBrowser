@@ -37,6 +37,7 @@ public class InAppBrowserDialog extends Dialog {
     public InAppBrowserDialog(Context context, int theme) {
         super(context, theme);
         this.context = context;
+        LastTouch = System.currentTimeMillis(); // initial value is when app is loaded.
     }
 
     public void setInAppBroswer(InAppBrowser browser) {
@@ -59,14 +60,23 @@ public class InAppBrowserDialog extends Dialog {
 
     public boolean dispatchTouchEvent(MotionEvent event)
     {
-        LastTouch = System.currentTimeMillis()/1000;    // this will be available in plugin.
+        LastTouch = System.currentTimeMillis();    // this will be available in plugin.
         return super.dispatchTouchEvent(event);
     }
     /**
      * callable by plugin
-     * @return last touch time is seconds (0 if none yet)
+     * @return last touch time is milliseconds
      **/
     public Long getLastTouchTime(){
         return LastTouch;
     }
+    
+    /**
+     * set last touch time. this is a form of reset
+     * @param long ltt timestamp in milliseconds wanted
+     * */
+   public void setLastTouchTime(Long ltt)
+   {
+	   LastTouch = ltt;
+   }
 }

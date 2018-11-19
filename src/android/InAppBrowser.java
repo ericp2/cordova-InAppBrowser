@@ -297,13 +297,20 @@ public class InAppBrowser extends CordovaPlugin {
             pluginResult.setKeepCallback(true);
             this.callbackContext.sendPluginResult(pluginResult);
         }
-        else if (action.equals("getLastTouchTs")){		// retrieve time in s the interface was last touched/clicked etc.
+        else if (action.equals("getLastTouchTs")){		// retrieve time in ms the interface was last touched/clicked etc.
             Long lasttouch = dialog.getLastTouchTime();
             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, lasttouch.toString());
             pluginResult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginResult);
             return true;
-            //callbackContext.success(lasttouch.toString());
+        }
+        else if (action.equals("setLastTouchTs")){		// set last touch tim in ms the interface was last touched/clicked etc.
+			Long lts = args.getLong(0);
+            dialog.setLastTouchTime(lts);
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, lts.toString()); // return same value back.
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
+            return true;
         }
         else {
             return false;

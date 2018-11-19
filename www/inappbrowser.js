@@ -52,6 +52,9 @@ cordova.define("cordova-plugin-inappbrowser.inappbrowser", function(require, exp
         getLastTouchTs: function(successCallback) {
             exec(successCallback, null, "InAppBrowser", "getLastTouchTs", []);
         },
+       setLastTouchTs: function(lts,successCallback) {
+            exec(successCallback, null, "InAppBrowser", "setLastTouchTs", [lts]);
+        },
 
 
         close: function (eventname) {
