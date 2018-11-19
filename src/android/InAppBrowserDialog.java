@@ -21,6 +21,7 @@ package org.apache.cordova.inappbrowser;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.view.MotionEvent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,6 +32,7 @@ import org.json.JSONObject;
 public class InAppBrowserDialog extends Dialog {
     Context context;
     InAppBrowser inAppBrowser = null;
+    protected Long LastTouch = 0L;  // holds last touch interaction time in s (timestamp)
 
     public InAppBrowserDialog(Context context, int theme) {
         super(context, theme);
@@ -53,5 +55,18 @@ public class InAppBrowserDialog extends Dialog {
                 this.inAppBrowser.closeDialog();
             }
         }
+    }
+
+    public boolean dispatchTouchEvent(MotionEvent event)
+    {
+        LastTouch = System.currentTimeMillis()/1000;    // this will be available in plugin.
+        return super.dispatchTouchEvent(event);
+    }
+    /**
+     * callable by plugin
+     * @return last touch time is seconds (0 if none yet)
+     **/
+    public Long getLastTouchTime(){
+        return LastTouch;
     }
 }
