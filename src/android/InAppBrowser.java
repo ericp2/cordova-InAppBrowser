@@ -116,6 +116,7 @@ public class InAppBrowser extends CordovaPlugin {
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
+    private View decorView;
     private EditText edittext;
     private CallbackContext callbackContext;
     private boolean showLocationBar = true;
@@ -775,11 +776,16 @@ public class InAppBrowser extends CordovaPlugin {
 
                 return _close;
             }
-
             @SuppressLint("NewApi")
             public void run() {
 
-                // CB-6702 InAppBrowser hangs when opening more than one instance
+                final int uiOptions =
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;                // CB-6702 InAppBrowser hangs when opening more than one instance
                 if (dialog != null) {
                     dialog.dismiss();
                 };
@@ -789,14 +795,38 @@ public class InAppBrowser extends CordovaPlugin {
                 dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 // set immersive mode (hide onscreen buttons if any)
-                dialog.getWindow().getDecorView().setSystemUiVisibility(
+                decorView = dialog.getWindow().getDecorView();
+                decorView.setSystemUiVisibility(uiOptions);
+                /*
                       View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 					| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
 					| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 					| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
 					| View.SYSTEM_UI_FLAG_FULLSCREEN
-					| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+					| View.SYSTEM_UI_FLAG_IMMERSIVE);
+				*/
 
+                decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener()
+                {
+                    @Override
+                    public void onSystemUiVisibilityChange(int visibility)
+                    {
+                        decorView.setSystemUiVisibility(uiOptions);
+                    }
+                });
+
+
+                decorView.setOnFocusChangeListener(new View.OnFocusChangeListener()
+                {
+                    @Override
+                    public void onFocusChange(View v, boolean hasFocus)
+                    {
+                        if (hasFocus)
+                        {
+                            decorView.setSystemUiVisibility(uiOptions);
+                        }
+                    }
+                });
                 dialog.setCancelable(true);
                 dialog.setInAppBroswer(getInAppBrowser());
 
